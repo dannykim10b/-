@@ -1,0 +1,6 @@
+.grid {
+  display: inline-grid;
+  border: 4px solid;
+  cursor: pointer;
+  font-size: 0;
+}
