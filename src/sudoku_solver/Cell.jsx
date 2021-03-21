@@ -32,12 +32,15 @@ export default function Cell(props) {
         style['backgroundColor'] = "gray"
     }
 
+    if(status === "solved") {
+        style['backgroundColor'] = "lightgreen"
+    }
+
     const handleChange = (e) => {
         let allowedInput = /^$|[1-9]/
         if(allowedInput.test(e.target.value)) {
             updateGrid(row, col, e.target.value)
             setValue(e.target.value)
-            console.log(grid[row][col])
         } else return
     }
 

@@ -4,3 +4,19 @@
   cursor: pointer;
   font-size: 0;
 }
+
+.header {
+}
+
+.buttons {
+}
+
+.status-message {
+  height: 30px;
+}
+
+.divider {
+  width: 15px;
+  height: auto;
+  display: inline-block;
+}

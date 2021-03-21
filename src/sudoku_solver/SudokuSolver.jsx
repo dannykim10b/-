@@ -7,12 +7,14 @@ export default function SudokuSolver() {
     const [grid, setGrid] = useState([])
     const [isLocked, setIsLocked] = useState(false)
     const [status, setStatus] = useState("")
+    const [basePuzzle, setBasePuzzle] = useState([])
     
 
     useEffect(() => {
 
         const startGrid = initializeGrid();
         setGrid(startGrid)
+        setBasePuzzle(startGrid)
 
     }, [])
 
@@ -43,33 +45,50 @@ export default function SudokuSolver() {
             for(let col=0; col<9; col++) {
                 if(resetGrid[row][col].status !== "locked") {
                     resetGrid[row][col].value = ""
+                    resetGrid[row][col].status = ""
                     document.getElementById(`cell-${row}-${col}`).readOnly = false
                 }
             }
         }
         setGrid(resetGrid)
+        setBasePuzzle(resetGrid)
         setStatus("")
     }
 
     const updateGrid = (row, col, value) => {
-        grid[row][col].value = value
+        const updatedGrid = deepCopy(grid)
+        updatedGrid[row][col].value = value
+        setGrid(updatedGrid)
     }
 
-    const solvedGrid = () => {
-        const solvedGrid = deepCopy(grid)
+    const solveGrid = () => {
+        const solvedGrid = deepCopy(basePuzzle)
+
         if(!isSolvable(solvedGrid)) return 
+
         solvePuzzle(solvedGrid)
-        setGrid(solvedGrid)
+
         for(let row=0; row<grid.length; row++) {
             for(let col=0; col<grid.length; col++) {
-                document.getElementById(`cell-${row}-${col}`).readOnly = true
+                if(solvedGrid[row][col].status !== "locked") {
+                    solvedGrid[row][col].status = "solved"
+                    document.getElementById(`cell-${row}-${col}`).readOnly = true
+
+                }
             }
         }
+        setStatus("solved")
+        setGrid(solvedGrid)
     }
 
-    const check = () => {
-        const solvedGrid = deepCopy(grid)
-        if(!isSolvable(solvedGrid)) return
+
+    //fix this
+    const checkSolution = () => {
+        const solvedGrid = deepCopy(basePuzzle)
+        if(!isSolvable(solvedGrid)) {
+            setStatus("unsolved")
+            return
+        }
         solvePuzzle(solvedGrid)
         for(let row=0; row<grid.length; row++) {
             for(let col=0; col<grid.length; col++) {
@@ -96,6 +115,7 @@ export default function SudokuSolver() {
             }
         }
         setGrid(lockedGrid)
+        setBasePuzzle(lockedGrid)
         setIsLocked(true)
         setStatus("")
     }
@@ -111,17 +131,23 @@ export default function SudokuSolver() {
             }
         }
         setGrid(unlockedGrid)
+        setBasePuzzle(initializeGrid())
         setIsLocked(false)
         setStatus("")
     }
 
     const generateRandomBoard = () => {
         // unlockGrid()
+        setStatus("")
         const randomGrid = deepCopy(grid)
         const randomBoard = getRandomBoard()
         for(let row=0; row<grid.length; row++) {
             for(let col=0; col<grid.length; col++) {
                 if(randomGrid[row][col].status === "locked") {
+                    randomGrid[row][col].status = ""
+                    document.getElementById(`cell-${row}-${col}`).readOnly = false
+                }
+                if(randomGrid[row][col].status === "solved") {
                     randomGrid[row][col].status = ""
                     document.getElementById(`cell-${row}-${col}`).readOnly = false
                 }
@@ -133,6 +159,7 @@ export default function SudokuSolver() {
             }
         }
         setGrid(randomGrid)
+        setBasePuzzle(randomGrid)
         setIsLocked(true)
     }
 
@@ -141,23 +168,36 @@ export default function SudokuSolver() {
 
     return (
         <>
-
+            <div className="header">
             <h1>Sudoku</h1>
-            <button onClick={resetBoard}>reset</button>
-            <button onClick={generateRandomBoard}>generate random board</button>
-            <button onClick={check}>check</button>
-            <button onClick={solvedGrid}>solve</button>
+            </div>
+
+            <div className="buttons">
+            <button onClick={resetBoard}>Reset</button>
+            <div className="divider"/>
+
+            <button onClick={generateRandomBoard}>Generate Board</button>
+            <div className="divider"/>
+
+            <button onClick={checkSolution}>Check</button>
+            <div className="divider"/>
+
+            <button onClick={solveGrid}>Solve</button>
+            <div className="divider"/>
 
             {isLocked
-                ? <button onClick={unlockGrid}>unlock board</button>
-                : <button onClick={lockGrid}>lock board</button>
+                ? <button onClick={unlockGrid}>Unlock</button>
+                : <button onClick={lockGrid}>Lock</button>
             }
+            </div>
 
+            <div className="status-message">
             {status === "" ? <h3></h3>
                 : status === "unsolved" ? <h3>Board is unsolved</h3>
                 : status === "solved" ? <h3>Board is solved!</h3>
                 : ""
             }
+            </div>
             <Board 
                 grid={grid}
                 updateGrid={updateGrid}
