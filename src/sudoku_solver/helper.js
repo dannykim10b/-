@@ -1,5 +1,3 @@
-import {randomBoards} from './puzzles'
-
 export function solvePuzzle(grid) {
 
     const emptyCell = findEmptyCell(grid)
@@ -9,9 +7,27 @@ export function solvePuzzle(grid) {
         var col = emptyCell[1]
     }
 
-    for(let i=1; i<10; i++) {
-        if(isValid(grid, i, row, col)) {
-            grid[row][col].value = i.toString()
+
+    //instead of iterating thru 1-9 try picking rand numbers
+
+    //1-9
+    // for(let i=1; i<10; i++) {
+    //     if(isValid(grid, i, row, col)) {
+    //         grid[row][col].value = i.toString()
+    //         if(solvePuzzle(grid)) return true
+    //         grid[row][col].value = ""
+    //     }
+    // }
+
+
+    //random numbers between 1-9
+    //make this more random
+    const nums = [1,2,3,4,5,6,7,8,9]
+    shuffle(nums)
+    for(let i=0; i<9; i++) {
+        const number = nums[i]
+        if(isValid(grid, number, row, col)) {
+            grid[row][col].value = number.toString()
             if(solvePuzzle(grid)) return true
             grid[row][col].value = ""
         }
@@ -19,6 +35,15 @@ export function solvePuzzle(grid) {
     return false
 }
 
+
+function shuffle(array) {
+    for(let i = array.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * i)
+        const temp = array[i]
+        array[i] = array[j]
+        array[j] = temp
+      }
+}
 
 export function isSolvable(grid) {
     const nonEmptyCells = findNonEmptyCells(grid)
@@ -111,10 +136,4 @@ function findNonEmptyCells(grid) {
         }
     }
     return nonEmptyCells
-}
-
-export function getRandomBoard() {
-    const num = Math.floor(Math.random()*3)
-    const board = randomBoards[num]
-    return board
 }

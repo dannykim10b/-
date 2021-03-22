@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Board from './Board'
 import './SudokuSolver.css'
-import {solvePuzzle, isSolvable, deepCopy, getRandomBoard} from './helper'
+import {solvePuzzle, isSolvable, deepCopy} from './helper'
+import { randomizeBoard } from './sudokugenerator'
 
 export default function SudokuSolver() {
     const [grid, setGrid] = useState([])
@@ -81,8 +82,6 @@ export default function SudokuSolver() {
         setGrid(solvedGrid)
     }
 
-
-    //fix this
     const checkSolution = () => {
         const solvedGrid = deepCopy(basePuzzle)
         if(!isSolvable(solvedGrid)) {
@@ -136,11 +135,38 @@ export default function SudokuSolver() {
         setStatus("")
     }
 
+    // const generateRandomBoard = () => {
+    //     // unlockGrid()
+    //     setStatus("")
+    //     const randomGrid = deepCopy(grid)
+    //     const randomBoard = getRandomBoard()
+        // for(let row=0; row<grid.length; row++) {
+        //     for(let col=0; col<grid.length; col++) {
+        //         if(randomGrid[row][col].status === "locked") {
+        //             randomGrid[row][col].status = ""
+        //             document.getElementById(`cell-${row}-${col}`).readOnly = false
+        //         }
+        //         if(randomGrid[row][col].status === "solved") {
+        //             randomGrid[row][col].status = ""
+        //             document.getElementById(`cell-${row}-${col}`).readOnly = false
+        //         }
+        //         randomGrid[row][col].value = randomBoard[row][col]
+        //         if(randomGrid[row][col].value !== "") {
+        //             randomGrid[row][col].status = "locked"
+        //             document.getElementById(`cell-${row}-${col}`).readOnly = true
+        //         }
+        //     }
+        // }
+        // setGrid(randomGrid)
+        // setBasePuzzle(randomGrid)
+        // setIsLocked(true)
+    // }
+
     const generateRandomBoard = () => {
-        // unlockGrid()
         setStatus("")
         const randomGrid = deepCopy(grid)
-        const randomBoard = getRandomBoard()
+        const randomizedBoard = initializeGrid()
+        randomizeBoard(randomizedBoard)
         for(let row=0; row<grid.length; row++) {
             for(let col=0; col<grid.length; col++) {
                 if(randomGrid[row][col].status === "locked") {
@@ -151,7 +177,7 @@ export default function SudokuSolver() {
                     randomGrid[row][col].status = ""
                     document.getElementById(`cell-${row}-${col}`).readOnly = false
                 }
-                randomGrid[row][col].value = randomBoard[row][col].toString()
+                randomGrid[row][col].value = randomizedBoard[row][col].value
                 if(randomGrid[row][col].value !== "") {
                     randomGrid[row][col].status = "locked"
                     document.getElementById(`cell-${row}-${col}`).readOnly = true
@@ -198,10 +224,12 @@ export default function SudokuSolver() {
                 : ""
             }
             </div>
+            <div className="board">
             <Board 
                 grid={grid}
                 updateGrid={updateGrid}
             />
+            </div>
         </>
     )
 }
